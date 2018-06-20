@@ -45,10 +45,12 @@ all_data[5] += 273.15
 B = 275e-3  # in Tesla
 e = 1.602177e-19  # in Coulomb
 d = 565e-6       # in meter
+k_b = 8.6173303e-5   # Boltzmann konstant in ev/K
 
 # Hallcoefficient
 
 R_H = d/B * all_data[4]
+R_H /= R_H[0]
 # R_H /= R_H[0]
 
 # density of charge n
@@ -63,11 +65,31 @@ n /= n[0]
 
 t_plot = 1.0/(1.0/4.0 * (all_data[1] + 3.0 * all_data[5]))
 
+log_of_n = np.log(n)
+gap = -1*((np.log(n[-2]/n[-1]))/(t_plot[-2] - t_plot[-1]))*2*k_b
 
-plt.ylabel(r"Ladungsträerdichte n \ $cm{-3}$")
-plt.xlabel(r"Temperatur $\frac{1}{T}$ \ $K^{-1}$")
-plt.errorbar(t_plot, np.log(n), np.log(n)*0.2, 0.05*t_plot, ecolor="r", fmt=".b", label="Messwerte")
-plt.legend(loc="best")
+gap_err = 2*k_b * np.sqrt(
+    (log_of_n[-2]*0.05/(t_plot[-2]-t_plot[-1]))**2
+    + (log_of_n[-1]*0.05/(t_plot[-2]-t_plot[-1]))**2
+    + ((log_of_n[-2]-log_of_n[-1])*t_plot[-1]*0.05/(t_plot[-2]-t_plot[-1])**2)**2
+    + ((log_of_n[-2]-log_of_n[-1])*t_plot[-2]*0.05/(t_plot[-2]-t_plot[-1])**2)**2
+)
+
+print(all_data[5][-1])
+
+# Density of charge
+
+# plt.ylabel(r"Ladungsträerdichte $ln(\frac{n}{n(T=97,97 K)})$")
+# plt.xlabel(r"Temperatur $\frac{1}{T}$ \ $K^{-1}$")
+# plt.errorbar(t_plot, np.log(n), np.log(n)*0.2, 0.05*t_plot, ecolor="r", fmt=".b", label="Messwerte")
+# plt.legend(loc="best")
+
+# Hallkoefficient
+
+# plt.ylabel(r"Hallkoeffizient $ln(\frac{R_H}{R_H(T=97,97 K)})$")
+# plt.xlabel(r"Temperatur $\frac{1}{T}$ \ $K^{-1}$")
+# plt.errorbar(t_plot, np.log(R_H), np.log(R_H)*0.2, 0.05*t_plot, ecolor="r", fmt=".b", label="Messwerte")
+# plt.legend(loc="best")
 
 plt.show()
 
